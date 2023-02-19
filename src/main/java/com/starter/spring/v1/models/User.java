@@ -1,5 +1,6 @@
 package com.starter.spring.v1.models;
 
+import com.starter.spring.v1.enums.GENDER;
 import com.starter.spring.v1.enums.ROLE;
 import com.starter.spring.v1.enums.STATUS;
 import jakarta.persistence.*;
@@ -32,7 +33,17 @@ public class User {
     private ROLE role = ROLE.USER;
 
     @Enumerated(EnumType.STRING)
+    private GENDER gender;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private STATUS accountStatus = STATUS.UNVERIFIED;
+
+    public User(String names, String email, String password, GENDER gender) {
+        this.names = names;
+        this.email = email;
+        this.password = password;
+        this.gender = gender;
+    }
 
 }

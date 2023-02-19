@@ -1,39 +1,58 @@
 package com.starter.spring.v1.serviceImpls;
 
+import com.starter.spring.v1.enums.STATUS;
 import com.starter.spring.v1.models.User;
+import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.services.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+
     @Override
     public User createAccount(User user) {
-        return null;
+        return this.userRepository.save(user);
     }
 
     @Override
-    public User updateUser(User user, UUID userId) {
-        return null;
+    public User updateUser(User user) {
+        return this.userRepository.save(user);
     }
 
     @Override
     public String deleteUser(UUID userId, String password) {
-        return null;
+        User user = this.userRepository.findById(userId).orElseThrow(() -> new Error("User was not found"));
+        user.setAccountStatus(STATUS.DELETED);
+        this.userRepository.save(user);
+        return "Account deleted successfully";
     }
 
     @Override
     public List<User> getUsers() {
-        return null;
+        return this.userRepository.findAll();
     }
 
     @Override
     public User getUserById(UUID id) {
-        return null;
+        return this.userRepository.findById(id).orElseThrow(() -> new Error("User not found"));
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return this.userRepository.getUserByEmail(email).orElseThrow(() -> new Error("User not found"));
     }
 
     @Override
     public List<User> searchUser(String query) {
-        return null;
+        return this.userRepository.searchUser(query);
     }
+
+
 }
