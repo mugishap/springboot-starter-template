@@ -5,6 +5,7 @@ import com.starter.spring.v1.models.User;
 import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,9 +16,12 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User createAccount(User user) {
+        String password = user.getPassword();
+        user.setPassword(passwordEncoder.encode(password));
         return this.userRepository.save(user);
     }
 
@@ -46,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return this.userRepository.getUserByEmail(email).orElseThrow(() -> new Error("User not found"));
+        return this.userRepository.findByEmail(email).orElseThrow(() -> new Error("User not found"));
     }
 
     @Override

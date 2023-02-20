@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> searchUser(String searchQuery);
 
     @Query("SELECT u FROM User u WHERE u.email=:email")
-    Optional<User> getUserByEmail(String email);
+    Optional<User> findByEmail(String email);
 
 }
