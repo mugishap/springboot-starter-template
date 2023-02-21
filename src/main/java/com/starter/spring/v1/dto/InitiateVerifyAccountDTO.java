@@ -8,10 +8,10 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class InitiateResetPasswordDTO {
+public class InitiateVerifyAccountDTO {
 
     @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Should be a valid email")
+    @Email(message = "Email should be valid")
     private String email;
 
 }

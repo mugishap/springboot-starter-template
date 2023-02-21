@@ -17,12 +17,13 @@ public class MailService {
         message.setTo(toEmail);
         message.setText("Dear " + names + "!\n" +
                 "\n" +
-                "You've requested to reset password to Spring template, " +
-                "your verification code is " + passwordResetToken + ". \n" +
+                "You've requested to reset password to Spring template, click the link below to verify your account " +
                 "\n" +
-                "This code expires in 5 hours.\n" +
+                "This link expires in 5 hours.\n" +
                 "\n" +
-                "If you have any questions, send us an email precieux@support.com.\n" +
+                "https://starter-app.vercel.app/auth/forgot-password/" + passwordResetToken +
+                "\n" +
+                "If you have any questions, send us an email precieuxmugisha@gmail.com.\n" +
                 "\n" +
                 "We’re glad you’re here!\n" +
                 "\n");
@@ -30,17 +31,16 @@ public class MailService {
         mailSender.send(message);
     }
 
-    public void sendVerificationMail(String toEmail, String names, String passwordResetToken) {
+    public void sendVerificationMail(String toEmail, String names, String verificationToken) {
         message.setFrom("premugisha64@gmail.com");
         message.setTo(toEmail);
         message.setText("Dear " + names + "!\n" +
                 "\n" +
-                "You've requested to reset password to Spring template, " +
-                "your verification code is " + passwordResetToken + ". \n" +
+                "You've requested to verify you account in Spring template, " +
                 "\n" +
-                "This code expires in 5 hours.\n" +
+                "This link expires in 5 hours.\n" +
                 "\n" +
-                "If you have any questions, send us an email precieux@support.com.\n" +
+                "https://starter-app.vercel.app/auth/forgot-password/" + verificationToken +
                 "\n" +
                 "We’re glad you’re here!\n" +
                 "\n");

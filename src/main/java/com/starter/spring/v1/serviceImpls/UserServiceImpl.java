@@ -8,6 +8,7 @@ import com.starter.spring.v1.models.Verification;
 import com.starter.spring.v1.repositories.PasswordResetRepository;
 import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.repositories.VerificationRepository;
+import com.starter.spring.v1.services.CloudinaryService;
 import com.starter.spring.v1.services.UserService;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final VerificationRepository verificationRepository;
     private final PasswordResetRepository passwordResetRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public User createAccount(User user) {
@@ -52,7 +56,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user, UpdateUserDTO dto) {
         try {
-            String profileImage = "https://picsum.photos"; //TODO -> implement cloudinary upload function
+            Map uploadedResponse = this.cloudinaryService.uploadImage(dto.getImageStr());
+            String profileImage = uploadedResponse.get("secure_url").toString();
             user.setNames(dto.getNames());
             user.setEmail(dto.getEmail());
             user.setGender(dto.getGender());
@@ -60,6 +65,8 @@ public class UserServiceImpl implements UserService {
             return this.userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             return null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

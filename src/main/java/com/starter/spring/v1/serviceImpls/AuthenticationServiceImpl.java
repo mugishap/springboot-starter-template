@@ -10,6 +10,7 @@ import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.repositories.VerificationRepository;
 import com.starter.spring.v1.responses.AuthResponse;
 import com.starter.spring.v1.services.AuthenticationService;
+import com.starter.spring.v1.services.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetRepository passwordResetRepository;
     private final VerificationRepository verificationRepository;
-
+    private final MailService mailService;
 
     @Override
     public AuthResponse login(String email, String password) {
@@ -55,14 +56,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String initiateResetPassword(String email) {
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email (" + email + ") does not exist"));
         PasswordReset passwordReset = user.getPasswordReset();
-        passwordReset.setPasswordResetToken(UUID.randomUUID().toString());
+        String paswordResetToken = UUID.randomUUID().toString();
+        passwordReset.setPasswordResetToken(paswordResetToken);
         Date today = new Date();
         long longTime = today.getTime() + 5 * 60 * 60 * 1000;
         Date expiresAt = new Date(longTime);
         passwordReset.setExpiresAt(expiresAt);
         this.passwordResetRepository.save(passwordReset);
         this.userRepository.save(user);
-        //TODO -> implement sending email
+        this.mailService.sendResetPasswordMail(user.getEmail(), user.getNames(), paswordResetToken);
         return "Check you email for password reset link";
     }
 
@@ -85,13 +87,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String initiateVerifyAccount(String email) {
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email (" + email + ") does not exist"));
         Verification verification = user.getVerification();
-        verification.setVerificationToken(UUID.randomUUID().toString());
+        String verificationToken = UUID.randomUUID().toString();
+        verification.setVerificationToken(verificationToken);
         long longTime = new Date().getTime() + 5 * 60 * 60 * 1000;
         Date expiresAt = new Date(longTime);
         verification.setExpiresAt(expiresAt);
         this.verificationRepository.save(verification);
         this.userRepository.save(user);
-        //TODO -> implement sending email
+        this.mailService.sendVerificationMail(user.getEmail(), user.getNames(), verificationToken);
         return "Check you email for account verification link";
     }
 
