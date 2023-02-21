@@ -9,10 +9,12 @@ public interface AuthenticationService {
 
     public String initiateResetPassword(String email);
 
-    public User resetPassword(String token, String newPassword);
+    public String resetPassword(String token, String newPassword);
 
-    public User initiateVerifyAccount(String email);
+    public String initiateVerifyAccount(String email);
 
-    public User verifyAccount(String token);
+    public String verifyAccount(String token);
+
+    public User getLoggedInUser();
 
 }

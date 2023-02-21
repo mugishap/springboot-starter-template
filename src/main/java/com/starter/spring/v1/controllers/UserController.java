@@ -33,29 +33,31 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody CreateUserDTO dto, BindingResult bindingResult) {
-            if (bindingResult.hasErrors()) {
-                List<String> errors = bindingResult.getAllErrors()
-                        .stream().map(error -> error.getDefaultMessage())
-                        .collect(Collectors.toList());
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "Validation failed", errors));
-            }
-            User user = new User(dto.getNames(), dto.getEmail(), dto.getPassword(), dto.getGender());
-            User entity = this.userService.createAccount(user);
-            URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user/create").toString());
-            if(entity == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "User with that email already exists"));
-            return ResponseEntity.created(uri).body(new ApiResponse(true, "Account created successfully", entity));
+    public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid CreateUserDTO dto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getAllErrors()
+                    .stream().map(error -> error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Validation failed", errors));
+        }
+        User user = new User(dto.getNames(), dto.getEmail(), dto.getPassword(), dto.getGender());
+        User entity = this.userService.createAccount(user);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user/create").toString());
+        if (entity == null)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "User with that email already exists"));
+        return ResponseEntity.created(uri).body(new ApiResponse(true, "Account created successfully", entity));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateUSer(@RequestBody UpdateUserDTO dto) {
-        User user = this.userService.getUserByEmail(dto.getEmail());
-        return ResponseEntity.ok().body(new ApiResponse(true, "User updated successfully", this.userService.updateUser(user)));
+    public ResponseEntity<ApiResponse> updateUser(@RequestBody UpdateUserDTO dto) {
+        User user = this.userService.getUserByEmail(dto.getEmail()); //TODO -> implement to get logged in user
+        if(user == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "Email already exists"));
+        return ResponseEntity.ok().body(new ApiResponse(true, "User updated successfully", this.userService.updateUser(user,dto)));
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse> deleteUser(@RequestBody String password) {
-        User user = this.userService.getUserByEmail("precieuxmugisha@gmail.com");
+        User user = this.userService.getUserByEmail("precieuxmugisha@gmail.com"); //TODO -> implement to get logged in user
         return ResponseEntity.ok().body(new ApiResponse(true, this.userService.deleteUser(user.getId(), password)));
     }
 

@@ -33,6 +33,9 @@ public class User implements UserDetails {
     @Column(length = 50, unique = true)
     private String email;
 
+    @Column(name = "profileImage")
+    private String profile;
+
     @JsonIgnore()
     @Column(name = "password")
     private String password;

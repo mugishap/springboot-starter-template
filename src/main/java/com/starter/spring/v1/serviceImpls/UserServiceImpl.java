@@ -1,8 +1,13 @@
 package com.starter.spring.v1.serviceImpls;
 
+import com.starter.spring.v1.dto.UpdateUserDTO;
 import com.starter.spring.v1.enums.STATUS;
+import com.starter.spring.v1.models.PasswordReset;
 import com.starter.spring.v1.models.User;
+import com.starter.spring.v1.models.Verification;
+import com.starter.spring.v1.repositories.PasswordResetRepository;
 import com.starter.spring.v1.repositories.UserRepository;
+import com.starter.spring.v1.repositories.VerificationRepository;
 import com.starter.spring.v1.services.UserService;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +23,23 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final VerificationRepository verificationRepository;
+    private final PasswordResetRepository passwordResetRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public User createAccount(User user) {
         try {
+            PasswordReset passwordReset = new PasswordReset();
+            Verification verification = new Verification();
+            verification.setUser(user);
+            passwordReset.setUser(user);
+            user.setPasswordReset(passwordReset);
+            user.setVerification(verification);
+
+            this.passwordResetRepository.save(passwordReset);
+            this.verificationRepository.save(verification);
+
             System.out.println(user.toString());
             String password = user.getPassword();
             user.setPassword(passwordEncoder.encode(password));
@@ -33,8 +50,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return this.userRepository.save(user);
+    public User updateUser(User user, UpdateUserDTO dto) {
+        try {
+            String profileImage = "https://picsum.photos"; //TODO -> implement cloudinary upload function
+            user.setNames(dto.getNames());
+            user.setEmail(dto.getEmail());
+            user.setGender(dto.getGender());
+            user.setProfile(profileImage);
+            return this.userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            return null;
+        }
     }
 
     @Override
