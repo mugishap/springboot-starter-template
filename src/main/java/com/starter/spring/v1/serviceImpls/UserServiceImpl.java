@@ -10,12 +10,10 @@ import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.repositories.VerificationRepository;
 import com.starter.spring.v1.services.CloudinaryService;
 import com.starter.spring.v1.services.UserService;
-import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

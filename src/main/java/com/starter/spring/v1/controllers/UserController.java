@@ -5,15 +5,12 @@ import com.starter.spring.v1.dto.UpdateUserDTO;
 import com.starter.spring.v1.models.User;
 import com.starter.spring.v1.responses.ApiResponse;
 import com.starter.spring.v1.serviceImpls.UserServiceImpl;
-import jakarta.persistence.PersistenceException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
