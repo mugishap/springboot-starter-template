@@ -17,9 +17,9 @@ public class AuthenticationController {
     private final UserServiceImpl userService;
 
     @GetMapping("/test")
-    public ResponseEntity<String> tester() {
+    public ResponseEntity<ApiResponse> tester() {
         System.out.println("Accessing the tester controller");
-        return ResponseEntity.ok().body("Greetings");
+        return ResponseEntity.ok().body(new ApiResponse(true,"Greetings"));
     }
 
     @PostMapping("/login")

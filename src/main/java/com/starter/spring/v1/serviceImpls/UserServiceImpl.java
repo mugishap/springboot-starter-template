@@ -4,7 +4,9 @@ import com.starter.spring.v1.enums.STATUS;
 import com.starter.spring.v1.models.User;
 import com.starter.spring.v1.repositories.UserRepository;
 import com.starter.spring.v1.services.UserService;
+import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -20,9 +22,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createAccount(User user) {
-        String password = user.getPassword();
-        user.setPassword(passwordEncoder.encode(password));
-        return this.userRepository.save(user);
+        try {
+            System.out.println(user.toString());
+            String password = user.getPassword();
+            user.setPassword(passwordEncoder.encode(password));
+            return this.userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            return null;
+        }
     }
 
     @Override

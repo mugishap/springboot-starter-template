@@ -5,14 +5,20 @@ import com.starter.spring.v1.dto.UpdateUserDTO;
 import com.starter.spring.v1.models.User;
 import com.starter.spring.v1.responses.ApiResponse;
 import com.starter.spring.v1.serviceImpls.UserServiceImpl;
+import jakarta.persistence.PersistenceException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -27,11 +33,18 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserDTO dto) {
-        User user = new User(dto.getNames(), dto.getEmail(), dto.getPassword(), dto.getGender());
-        User entity = this.userService.createAccount(user);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user/create").toString());
-        return ResponseEntity.created(uri).body(new ApiResponse(true, "Account created successfully", entity));
+    public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody CreateUserDTO dto, BindingResult bindingResult) {
+            if (bindingResult.hasErrors()) {
+                List<String> errors = bindingResult.getAllErrors()
+                        .stream().map(error -> error.getDefaultMessage())
+                        .collect(Collectors.toList());
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Validation failed", errors));
+            }
+            User user = new User(dto.getNames(), dto.getEmail(), dto.getPassword(), dto.getGender());
+            User entity = this.userService.createAccount(user);
+            URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/user/create").toString());
+            if(entity == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "User with that email already exists"));
+            return ResponseEntity.created(uri).body(new ApiResponse(true, "Account created successfully", entity));
     }
 
     @PutMapping("/update")

@@ -1,5 +1,6 @@
 package com.starter.spring.v1.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.starter.spring.v1.enums.GENDER;
 import com.starter.spring.v1.enums.ROLE;
 import com.starter.spring.v1.enums.STATUS;
@@ -29,9 +30,10 @@ public class User implements UserDetails {
     @Column(length = 40)
     private String names;
 
-    @Column(length = 50)
+    @Column(length = 50, unique = true)
     private String email;
 
+    @JsonIgnore()
     @Column(name = "password")
     private String password;
 
@@ -45,12 +47,11 @@ public class User implements UserDetails {
     @Column(name = "status")
     private STATUS accountStatus = STATUS.UNVERIFIED;
 
-    public User(String names, String email, String password, GENDER gender) {
-        this.names = names;
-        this.email = email;
-        this.password = password;
-        this.gender = gender;
-    }
+    @OneToOne()
+    public Verification verification;
+
+    @OneToOne()
+    public PasswordReset passwordReset;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,5 +86,12 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public User(String names, String email, String password, GENDER gender) {
+        this.names = names;
+        this.email = email;
+        this.password = password;
+        this.gender = gender;
     }
 }
