@@ -25,7 +25,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> login(@RequestBody @Valid LoginDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-            return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid data passed", errors));
         }
         return ResponseEntity.ok().body(new ApiResponse(true, "Login successful", this.authenticationService.login(dto.getEmail(), dto.getPassword())));
     }
@@ -36,14 +36,17 @@ public class AuthenticationController {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
             return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
         }
-        return ResponseEntity.ok().body(new ApiResponse(true, this.authenticationService.initiateResetPassword(dto.getEmail())));
+        String entity = this.authenticationService.initiateResetPassword(dto.getEmail());
+        if (entity == null)
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Unable to send password reset email"));
+        return ResponseEntity.ok().body(new ApiResponse(true, entity));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody ResetPasswordDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-            return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid data passed", errors));
         }
         return ResponseEntity.ok().body(new ApiResponse(true, this.authenticationService.resetPassword(dto.getResetPasswordToken(), dto.getNewPassword())));
     }
@@ -61,7 +64,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> verifyAccount(@RequestBody @Valid VerifyAccountDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-            return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid data passed", errors));
         }
         return ResponseEntity.ok().body(new ApiResponse(true, this.authenticationService.verifyAccount(dto.getToken())));
     }

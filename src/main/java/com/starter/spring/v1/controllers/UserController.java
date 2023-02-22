@@ -24,12 +24,12 @@ public class UserController {
 
     private final UserServiceImpl userService;
 
-    @GetMapping("/all")
+    @GetMapping("/unsecure/all")
     public ResponseEntity<ApiResponse> getAllUsers() {
         return ResponseEntity.ok().body(new ApiResponse(true, "Users fetched successfully", this.userService.getUsers()));
     }
 
-    @PostMapping("/create")
+    @PostMapping("/unsecure/create")
     public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid CreateUserDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors()

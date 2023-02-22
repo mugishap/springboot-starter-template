@@ -61,7 +61,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         passwordReset.setExpiresAt(expiresAt);
         this.passwordResetRepository.save(passwordReset);
         this.userRepository.save(user);
-        this.mailService.sendResetPasswordMail(user.getEmail(), user.getNames(), paswordResetToken);
+        String mail = this.mailService.sendResetPasswordMail(user.getEmail(), user.getNames(), paswordResetToken);
+        if(mail == null) return null;
         return "Check you email for password reset link";
     }
 
