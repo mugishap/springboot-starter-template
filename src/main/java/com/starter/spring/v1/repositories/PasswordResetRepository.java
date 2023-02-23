@@ -7,10 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface PasswordResetRepository extends JpaRepository<PasswordReset, UUID> {
+public interface PasswordResetRepository extends JpaRepository<PasswordReset, Long> {
 
     @Query("SELECT p.user FROM PasswordReset p WHERE p.passwordResetToken=:passwordResetToken AND p.expiresAt > current date ")
     public Optional<User> getUserByPasswordResetCode(String passwordResetToken);

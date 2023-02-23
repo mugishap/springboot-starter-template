@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u" +
             " WHERE (lower(u.names)  LIKE ('%' || lower(:searchQuery) || '%')) " +

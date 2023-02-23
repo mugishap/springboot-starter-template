@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,18 +53,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public String initiateResetPassword(String email) {
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email (" + email + ") does not exist"));
-        PasswordReset passwordReset = user.getPasswordReset();
-        String paswordResetToken = UUID.randomUUID().toString();
-        passwordReset.setPasswordResetToken(paswordResetToken);
-        Date today = new Date();
-        long longTime = today.getTime() + 5 * 60 * 60 * 1000;
+
+        //Create new password reset token model for the user
+        PasswordReset passwordReset = new PasswordReset();
+        passwordReset.setUser(user);
+        String passwordResetToken = UUID.randomUUID().toString();
+        passwordReset.setPasswordResetToken(passwordResetToken);
+        long longTime = new Date().getTime() + 5 * 60 * 60 * 1000;
         Date expiresAt = new Date(longTime);
         passwordReset.setExpiresAt(expiresAt);
         this.passwordResetRepository.save(passwordReset);
+
+        //Change user verification object
+        user.setPasswordReset(passwordReset);
         this.userRepository.save(user);
-        String mail = this.mailService.sendResetPasswordMail(user.getEmail(), user.getNames(), paswordResetToken);
-        if(mail == null) return null;
-        return "Check you email for password reset link";
+
+        //Send email
+        this.mailService.sendResetPasswordMail(user.getEmail(), user.getNames(), passwordResetToken);
+        return "Check you email for password reset token link";
     }
 
     @Override
@@ -83,16 +90,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public String initiateVerifyAccount(String email) {
+
         User user = this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with email (" + email + ") does not exist"));
-        Verification verification = user.getVerification();
+        Verification checkVerification = user.getVerification();
+        if (checkVerification != null) {
+            this.verificationRepository.deleteById(checkVerification.getId());
+            user.setVerification(null);
+            user.setAccountStatus(STATUS.UNVERIFIED);
+            this.userRepository.save(user);
+        }
+        //Create new verification model for the user
+        Verification verification = new Verification();
+        verification.setUser(user);
+        verification.setVerified(false);
         String verificationToken = UUID.randomUUID().toString();
         verification.setVerificationToken(verificationToken);
         long longTime = new Date().getTime() + 5 * 60 * 60 * 1000;
         Date expiresAt = new Date(longTime);
         verification.setExpiresAt(expiresAt);
         this.verificationRepository.save(verification);
+
+        //Change user verification object
+        user.setVerification(verification);
         this.userRepository.save(user);
-        this.mailService.sendVerificationMail(user.getEmail(), user.getNames(), verificationToken);
+
+        //Send email
+        String mail = this.mailService.sendVerificationMail(user.getEmail(), user.getNames(), verificationToken);
         return "Check you email for account verification link";
     }
 
@@ -103,6 +126,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Verification verification = _user.get().verification;
         verification.setVerificationToken(null);
         verification.setExpiresAt(null);
+        verification.setVerifiedAt(new Date());
         verification.setVerified(true);
         User user = _user.get();
         user.setAccountStatus(STATUS.ACTIVE);

@@ -2,9 +2,8 @@ package com.starter.spring.v1.services;
 
 import com.starter.spring.v1.dto.UpdateUserDTO;
 import com.starter.spring.v1.models.User;
-
 import java.util.List;
-import java.util.UUID;
+
 
 public interface UserService {
 
@@ -12,11 +11,11 @@ public interface UserService {
 
     public User updateUser(User user, UpdateUserDTO dto);
 
-    public String deleteUser(UUID userId, String password);
+    public String deleteUser(Long userId, String password);
 
     public List<User> getUsers();
 
-    public User getUserById(UUID id);
+    public User getUserById(Long id);
 
     public User getUserByEmail(String email);
 

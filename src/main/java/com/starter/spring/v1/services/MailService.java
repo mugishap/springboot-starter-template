@@ -1,5 +1,6 @@
 package com.starter.spring.v1.services;
 
+import com.sun.mail.util.MailConnectException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSendException;
@@ -24,7 +25,7 @@ public class MailService {
             message.setTo(toEmail);
             message.setText("Dear " + names + "!\n" +
                     "\n" +
-                    "You've requested to reset password to Spring template, click the link below to verify your account " +
+                    "You've requested to reset password to Spring template, click the link below to reset your password " +
                     "\n" +
                     "This link expires in 5 hours.\n" +
                     "\n" +
@@ -43,7 +44,8 @@ public class MailService {
         }
     }
 
-    public void sendVerificationMail(String toEmail, String names, String verificationToken) {
+    public String sendVerificationMail(String toEmail, String names, String verificationToken) {
+
         message.setFrom("premugisha64@gmail.com");
         message.setTo(toEmail);
         message.setText("Dear " + names + "!\n" +
@@ -52,12 +54,12 @@ public class MailService {
                 "\n" +
                 "This link expires in 5 hours.\n" +
                 "\n" +
-                "https://starter-app.vercel.app/auth/forgot-password/" + verificationToken +
+                "https://starter-app.vercel.app/auth/verify-email/" + verificationToken +
                 "\n" +
                 "We’re glad you’re here!\n" +
                 "\n");
-        message.setSubject("Spring template password reset");
+        message.setSubject("Spring template email verification");
         mailSender.send(message);
+        return "Verification email sent";
     }
-
 }

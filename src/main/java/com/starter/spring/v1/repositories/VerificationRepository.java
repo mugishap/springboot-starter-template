@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface VerificationRepository extends JpaRepository<Verification, UUID> {
+public interface VerificationRepository extends JpaRepository<Verification, Long> {
 
     @Query("SELECT v.user FROM Verification v WHERE v.verificationToken=:verificationToken AND v.expiresAt > current date ")
     public Optional<User> getUserByVerificationCode(String verificationToken);

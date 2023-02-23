@@ -34,7 +34,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> initiateResetPassword(@RequestBody @Valid InitiateResetPasswordDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-            return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid data passed", errors));
         }
         String entity = this.authenticationService.initiateResetPassword(dto.getEmail());
         if (entity == null)
@@ -55,9 +55,11 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> initiateVerifyAccount(@RequestBody @Valid InitiateVerifyAccountDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-            return ResponseEntity.ok().body(new ApiResponse(false, "Invalid data passed", errors));
+            return ResponseEntity.internalServerError().body(new ApiResponse(false, "Invalid data passed", errors));
         }
-        return ResponseEntity.ok().body(new ApiResponse(true, this.authenticationService.initiateVerifyAccount(dto.getEmail())));
+        String verification = this.authenticationService.initiateVerifyAccount(dto.getEmail());
+        if (verification == null) ResponseEntity.internalServerError().body(new ApiResponse(false, "Unable to send email"));
+        return ResponseEntity.ok().body(new ApiResponse(true, verification));
     }
 
     @PostMapping("/verify-account")

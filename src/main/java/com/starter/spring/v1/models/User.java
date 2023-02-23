@@ -11,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -24,7 +23,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     @Column(length = 40)
     private String names;
@@ -49,10 +48,10 @@ public class User implements UserDetails {
     @Column(name = "status")
     private STATUS accountStatus = STATUS.UNVERIFIED;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     public Verification verification;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     public PasswordReset passwordReset;
 
     @Override
